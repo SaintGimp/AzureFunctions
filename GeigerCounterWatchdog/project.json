@@ -1,0 +1,9 @@
+{
+  "frameworks": {
+    "net46":{
+      "dependencies": {
+        "TweetMoaSharp": "3.0.0.19"
+      }
+    }
+  }
+}
