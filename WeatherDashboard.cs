@@ -30,7 +30,7 @@ namespace SaintGimp
 
             var darkSkyApiKey = Environment.GetEnvironmentVariable("DarkSkyApiKey", EnvironmentVariableTarget.Process);
             var forecastLocation = GetEnvironmentVariable("ForecastLocation");
-            var weatherUri = new Uri($"https://api.darksky.net/forecast/{darkSkyApiKey}/{forecastLocation}?exclude=currently,minutely,daily,alerts,flags");
+            var weatherUri = new Uri($"https://api.darksky.net/forecast/{darkSkyApiKey}/{forecastLocation}?exclude=currently,minutely,alerts,flags");
             
             HttpClientHandler handler = new HttpClientHandler();
             handler.AutomaticDecompression = System.Net.DecompressionMethods.GZip;
@@ -42,6 +42,9 @@ namespace SaintGimp
             dynamic data = JObject.Parse(responseContent);
 
             var hourly = data.hourly;
+            var today = data.daily.data[0];
+            log.LogInformation($"Daily summary for today is: {today.summary}");
+            log.LogInformation($"Daily summary icon for today is: {today.icon}");
             log.LogInformation($"The hourly summary is: {hourly.summary}");
             log.LogInformation($"The hourly summary icon is: {hourly.icon}");
             log.LogInformation($"The hourly + 4 icon is: {hourly.data[3].icon}");
