@@ -30,8 +30,10 @@ namespace SaintGimp
             Auth.SetUserCredentials(consumerKey, consumerSecret, accessToken, accessTokenSecret);
             var user = User.GetUserFromScreenName("saintgimp");
             var result = Message.PublishMessage(message, user.Id);
-            log.LogInformation(result.SenderId.ToString());
-            log.LogInformation(result.RecipientId.ToString());
+            if (result == null)
+            {
+                throw new InvalidOperationException("Failed to send a Twitter notification.");
+            }
         }
 
         public static string GetEnvironmentVariable(string name)
