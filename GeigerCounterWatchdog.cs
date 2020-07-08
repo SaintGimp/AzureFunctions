@@ -11,11 +11,10 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Tweetinvi;
 
 namespace SaintGimp
 {
-    public static class GeigerCounterWatchdog
+    public class GeigerCounterWatchdog : FunctionBase
     {
         [FunctionName("GeigerCounterWatchdog")]
         public static async Task RunAsync([TimerTrigger("0 */30 * * * *")]TimerInfo myTimer, ILogger log)
@@ -58,11 +57,11 @@ namespace SaintGimp
 
                 if (difference > TimeSpan.FromMinutes(30))
                 {
-                    SendNotification("Hey, I think the geiger counter is offline!", log);
+                    SendTwitterNotification("Hey, I think the geiger counter is offline!", log);
                 }
                 else if (cpm > 256)
                 {
-                    SendNotification("Hey, I think the geiger counter is logging bad data!", log);
+                    SendTwitterNotification("Hey, I think the geiger counter is logging bad data!", log);
                 }
                 else
                 {
@@ -71,28 +70,8 @@ namespace SaintGimp
             }
             catch (Exception)
             {
-                SendNotification("I couldn't check on the geiger counter!", log);
+                SendTwitterNotification("I couldn't check on the geiger counter!", log);
             }
         }
-
-        static void SendNotification(string message, ILogger log)
-        {
-            log.LogInformation(message);
-
-            // These are retrieved from https://developer.twitter.com/en/apps/8049320
-            var consumerKey = GetEnvironmentVariable("TwitterConsumerKey");
-            var consumerSecret = GetEnvironmentVariable("TwitterConsumerSecret");
-            var accessToken = GetEnvironmentVariable("TwitterAccessTokenKey");
-            var accessTokenSecret = GetEnvironmentVariable("TwitterAccessTokenSecret");
-
-            Auth.SetUserCredentials(consumerKey, consumerSecret, accessToken, accessTokenSecret);
-            var user = User.GetUserFromScreenName("saintgimp");
-            Message.PublishMessage(message, user.Id);
-        }
-
-        public static string GetEnvironmentVariable(string name)
-        {
-            return System.Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
-        } 
     }
 }

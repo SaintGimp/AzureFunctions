@@ -10,7 +10,7 @@ using Particle.SDK;
 
 namespace SaintGimp
 {
-    public static class WeatherDashboard
+    public class WeatherDashboard : FunctionBase
     {
         [FunctionName("WeatherDashboard")]
         public static async Task RunAsync([TimerTrigger("0 */15 * * * *")]TimerInfo myTimer, ILogger log)
@@ -99,11 +99,6 @@ namespace SaintGimp
             await ParticleCloud.SharedCloud.TokenLoginAsync(weatherDashboardDeviceAccessKey);
             var device = await ParticleCloud.SharedCloud.GetDeviceAsync(weatherDashboardDeviceId);
             await device.RunFunctionAsync("display", forecast);
-        }
-
-        public static string GetEnvironmentVariable(string name)
-        {
-            return System.Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
         }
     }
 }

@@ -14,7 +14,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace SaintGimp
 {
-    public static class GOESImport
+    public class GOESImport : FunctionBase
     {
         [FunctionName("GOESImport")]
         public static async Task RunAsync([TimerTrigger("0 */6 * * * *")]TimerInfo myTimer, ILogger log)
@@ -105,11 +105,6 @@ namespace SaintGimp
             DateTime timestamp = data.hits.hits[0]._source["@timestamp"];
 
             return timestamp;
-        }
-
-        public static string GetEnvironmentVariable(string name)
-        {
-            return System.Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
         }
 
         public class Sample

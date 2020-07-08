@@ -11,11 +11,10 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Tweetinvi;
 
 namespace SaintGimp
 {
-    public static class EnergyMonitorWatchdog
+    public class EnergyMonitorWatchdog : FunctionBase
     {
         [FunctionName("EnergyMonitorWatchdog")]
         public static async Task RunAsync([TimerTrigger("0 */30 * * * *")]TimerInfo myTimer, ILogger log)
@@ -62,29 +61,8 @@ namespace SaintGimp
             }
             catch (Exception)
             {
-                SendNotification(log);
+                SendTwitterNotification("Hey, I think the energy monitor is offline!", log);
             }
         }
-
-        static void SendNotification(ILogger log)
-        {
-            var message = "Hey, I think the energy monitor is offline!";
-            log.LogInformation(message);
-
-            // These are retrieved from https://developer.twitter.com/en/apps/8049320
-            var consumerKey = GetEnvironmentVariable("TwitterConsumerKey");
-            var consumerSecret = GetEnvironmentVariable("TwitterConsumerSecret");
-            var accessToken = GetEnvironmentVariable("TwitterAccessTokenKey");
-            var accessTokenSecret = GetEnvironmentVariable("TwitterAccessTokenSecret");
-
-            Auth.SetUserCredentials(consumerKey, consumerSecret, accessToken, accessTokenSecret);
-            var user = User.GetUserFromScreenName("saintgimp");
-            Message.PublishMessage(message, user.Id);
-        }
-
-        public static string GetEnvironmentVariable(string name)
-        {
-            return System.Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
-        } 
     }
 }
