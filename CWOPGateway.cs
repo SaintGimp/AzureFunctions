@@ -59,6 +59,12 @@ namespace SaintGimp
                     throw new ApplicationException("No new data");
                 }
                 
+                if (mostRecentRecord.t3 == null)
+                {
+                    log.LogInformation("Didn't get a temperature from the weather station");
+                    return;
+                }
+
                 var temperature = (int)Math.Round((double)mostRecentRecord.t3 * 9.0 / 5.0 + 32.0);
                 log.LogInformation($"Temperature is {temperature} F");
                 
@@ -76,7 +82,7 @@ namespace SaintGimp
             catch (Exception e)
             {
                 log.LogInformation(e.ToString());
-                SendTwitterNotification("Hey, I think the temperature sensor is offline!", log);
+                SendTwitterNotification("Hey, I think the temperature sensors are offline!", log);
             }
         }
 
