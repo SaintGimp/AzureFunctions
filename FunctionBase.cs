@@ -21,7 +21,7 @@ namespace SaintGimp
             emailContent.PlainText = message;
             List<EmailAddress> emailAddresses = new List<EmailAddress> { new EmailAddress("saintgimp@hotmail.com") { DisplayName = "Eric Lee" } };
             EmailRecipients emailRecipients = new EmailRecipients(emailAddresses);
-            EmailMessage emailMessage = new EmailMessage("DoNotReply@72b83dc5-34f6-4670-91cf-3e9a4ef26bab.azurecomm.net", emailContent, emailRecipients);
+            EmailMessage emailMessage = new EmailMessage("AzureFunctions@72b83dc5-34f6-4670-91cf-3e9a4ef26bab.azurecomm.net", emailContent, emailRecipients);
             emailClient.Send(emailMessage, CancellationToken.None);
         }
     }
