@@ -35,7 +35,7 @@ namespace SaintGimp
 
         private static async Task SaveSample(Sample sample)
         {
-            var elasticSearchCredentials = GetEnvironmentVariable("ElasticSearchCredentials");
+            var elasticSearchCredentials = Environment.GetEnvironmentVariable("ElasticSearchCredentials");
 
             var httpClient = new HttpClient();
             var byteArray = Encoding.ASCII.GetBytes(elasticSearchCredentials);
@@ -72,7 +72,7 @@ namespace SaintGimp
 
         static async Task<DateTime> GetMostRecentElasticSearchTimestamp()
         {
-            var elasticSearchCredentials = GetEnvironmentVariable("ElasticSearchCredentials");
+            var elasticSearchCredentials = Environment.GetEnvironmentVariable("ElasticSearchCredentials");
 
             var httpClient = new HttpClient();
             var byteArray = Encoding.ASCII.GetBytes(elasticSearchCredentials);

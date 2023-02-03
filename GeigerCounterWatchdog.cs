@@ -23,7 +23,7 @@ namespace SaintGimp
             
             try
             {
-                var elasticSearchCredentials = GetEnvironmentVariable("ElasticSearchCredentials");
+                var elasticSearchCredentials = Environment.GetEnvironmentVariable("ElasticSearchCredentials");
             
                 var httpClient = new HttpClient();
                 var byteArray = Encoding.ASCII.GetBytes(elasticSearchCredentials);
@@ -57,11 +57,11 @@ namespace SaintGimp
 
                 if (difference > TimeSpan.FromMinutes(30))
                 {
-                    SendTwitterNotification("Hey, I think the geiger counter is offline!", log);
+                    SendEmailNotification("Hey, I think the geiger counter is offline!", log);
                 }
                 else if (cpm > 256)
                 {
-                    SendTwitterNotification("Hey, I think the geiger counter is logging bad data!", log);
+                    SendEmailNotification("Hey, I think the geiger counter is logging bad data!", log);
                 }
                 else
                 {
@@ -70,7 +70,7 @@ namespace SaintGimp
             }
             catch (Exception)
             {
-                SendTwitterNotification("I couldn't check on the geiger counter!", log);
+                SendEmailNotification("I couldn't check on the geiger counter!", log);
             }
         }
     }

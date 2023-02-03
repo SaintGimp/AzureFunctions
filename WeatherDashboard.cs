@@ -29,7 +29,7 @@ namespace SaintGimp
             log.LogInformation($"Getting current weather...");
 
             var darkSkyApiKey = Environment.GetEnvironmentVariable("DarkSkyApiKey", EnvironmentVariableTarget.Process);
-            var forecastLocation = GetEnvironmentVariable("ForecastLocation");
+            var forecastLocation = Environment.GetEnvironmentVariable("ForecastLocation");
             var weatherUri = new Uri($"https://api.darksky.net/forecast/{darkSkyApiKey}/{forecastLocation}?exclude=currently,minutely,alerts,flags");
             
             HttpClientHandler handler = new HttpClientHandler();

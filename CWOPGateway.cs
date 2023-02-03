@@ -23,7 +23,7 @@ namespace SaintGimp
             
             try
             {
-                var elasticSearchCredentials = GetEnvironmentVariable("ElasticSearchCredentials");
+                var elasticSearchCredentials = Environment.GetEnvironmentVariable("ElasticSearchCredentials");
             
                 var httpClient = new HttpClient();
                 var byteArray = Encoding.ASCII.GetBytes(elasticSearchCredentials);
@@ -82,7 +82,7 @@ namespace SaintGimp
             catch (Exception e)
             {
                 log.LogInformation(e.ToString());
-                SendTwitterNotification("Hey, I think the temperature sensors are offline!", log);
+                SendEmailNotification("Hey, I think the temperature sensors are offline!", log);
             }
         }
 
