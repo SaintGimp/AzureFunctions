@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using Azure.Communication.Email;
-using Azure.Communication.Email.Models;
+using Azure;
 
 namespace SaintGimp
 {
@@ -16,13 +16,15 @@ namespace SaintGimp
             log.LogInformation(message);
 
             string connectionString = Environment.GetEnvironmentVariable("EmailConnectionString");
-            EmailClient emailClient = new EmailClient(connectionString);
-            EmailContent emailContent = new EmailContent(message);
-            emailContent.PlainText = message;
-            List<EmailAddress> emailAddresses = new List<EmailAddress> { new EmailAddress("saintgimp@hotmail.com") { DisplayName = "Eric Lee" } };
-            EmailRecipients emailRecipients = new EmailRecipients(emailAddresses);
-            EmailMessage emailMessage = new EmailMessage("AzureFunctions@72b83dc5-34f6-4670-91cf-3e9a4ef26bab.azurecomm.net", emailContent, emailRecipients);
-            emailClient.Send(emailMessage, CancellationToken.None);
+            var emailClient = new EmailClient(connectionString);
+            var emailContent = new EmailContent(message)
+            {
+                PlainText = message
+            };
+            var emailAddresses = new List<EmailAddress> { new EmailAddress("saintgimp@hotmail.com", "Eric Lee") };
+            var emailRecipients = new EmailRecipients(emailAddresses);
+            var emailMessage = new EmailMessage("AzureFunctions@72b83dc5-34f6-4670-91cf-3e9a4ef26bab.azurecomm.net", emailRecipients, emailContent);
+            emailClient.Send(WaitUntil.Started, emailMessage, CancellationToken.None);
         }
     }
 }
