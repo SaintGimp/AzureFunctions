@@ -78,7 +78,7 @@ namespace SaintGimp
             var byteArray = Encoding.ASCII.GetBytes(elasticSearchCredentials);
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-            var uri = $"http://elasticsearch.saintgimp.org/logstash-goes/_search";
+            var uri = $"https://elasticsearch.saintgimp.org/logstash-goes/_search";
             var query = @"{
                 ""query"": {
                     ""match_all"": {}

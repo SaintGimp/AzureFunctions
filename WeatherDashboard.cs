@@ -28,6 +28,7 @@ namespace SaintGimp
         {
             // Weather Underground shut down free access. Dark Sky closed down entirely.
             // Open Weather Map seems to be fairly inaccurate, but it's the one we can use for free, so here we are.
+            // https://medium.com/@Ari_n/8-weather-api-alternatives-now-that-darksky-is-shutting-down-42a5ac395f93
 
             log.LogInformation($"Getting current weather...");
 
