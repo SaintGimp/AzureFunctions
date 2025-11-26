@@ -1,91 +1,93 @@
 using System;
-using System.Threading.Tasks;
-using System.Net.Http;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Particle.SDK;
 using Newtonsoft.Json.Linq;
-using Particle.SDK;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
-namespace SaintGimp
+namespace SaintGimp.Functions;
+
+public class WeatherDashboard(IConfiguration configuration, ILogger<WeatherDashboard> logger)
 {
-    public class WeatherDashboard : FunctionBase
+    private readonly IConfiguration configuration = configuration;
+    private readonly ILogger _logger = logger;
+
+    [Function("WeatherDashboard")]
+    public async Task Run([TimerTrigger("0 5/15 * * * *")] TimerInfo myTimer)
     {
-        [FunctionName("WeatherDashboard")]
-        public static async Task RunAsync([TimerTrigger("0 */15 * * * *")] TimerInfo myTimer, ILogger log)
+        _logger.LogInformation("C# Timer trigger function executed at: {executionTime}", DateTime.Now);
+        
+        var openWeatherApiKey = configuration["OpenWeatherApiKey"] ?? "";
+        var forecastLocationLat = configuration["ForecastLocationLat"] ?? "";
+        var forecastLocationLon = configuration["ForecastLocationLon"] ?? "";
+        var deviceId = configuration["DeviceId"] ?? "";
+        var deviceAccessKey = configuration["DeviceAccessKey"] ?? "";
+        
+        var forecast = await GetForecast(forecastLocationLat, forecastLocationLon, openWeatherApiKey);
+        await SendForecastToDevice(forecast, deviceId, deviceAccessKey);
+
+        if (myTimer.ScheduleStatus is not null)
         {
-            var forecast = await GetForecast(log);
-            await SendForecastToDevice(forecast, log);
-
-            log.LogInformation($"Done.");
-
+            _logger.LogInformation("Next timer schedule at: {nextSchedule}", myTimer.ScheduleStatus.Next);
         }
+    }
 
-        public static async Task<string> GetForecast(ILogger log)
+    private async Task<string> GetForecast(string forecastLocationLat, string forecastLocationLon, string openWeatherApiKey)
+    {
+        // Weather Underground shut down free access. Dark Sky closed down entirely.
+        // Open Weather Map seems to be fairly inaccurate, but it's the one we can use for free, so here we are.
+        // https://medium.com/@Ari_n/8-weather-api-alternatives-now-that-darksky-is-shutting-down-42a5ac395f93
+
+        Console.WriteLine($"Getting current weather...");
+
+        var handler = new HttpClientHandler
         {
-            // Weather Underground shut down free access. Dark Sky closed down entirely.
-            // Open Weather Map seems to be fairly inaccurate, but it's the one we can use for free, so here we are.
-            // https://medium.com/@Ari_n/8-weather-api-alternatives-now-that-darksky-is-shutting-down-42a5ac395f93
+            AutomaticDecompression = System.Net.DecompressionMethods.GZip
+        };
+        var httpClient = new HttpClient(handler);
+        var weatherUri = new Uri($"https://api.openweathermap.org/data/3.0/onecall?lat={forecastLocationLat}&lon={forecastLocationLon}&exclude=currently,minutely,alerts&appid={openWeatherApiKey}");
 
-            log.LogInformation($"Getting current weather...");
+        var response = await httpClient.GetAsync(weatherUri);
+        response.EnsureSuccessStatusCode();
+        var responseContent = await response.Content.ReadAsStringAsync();
+        dynamic data = JObject.Parse(responseContent);
 
-            var openWeatherApiKey = Environment.GetEnvironmentVariable("OpenWeatherApiKey", EnvironmentVariableTarget.Process);
-            var forecastLocationLat = Environment.GetEnvironmentVariable("ForecastLocationLat");
-            var forecastLocationLon = Environment.GetEnvironmentVariable("ForecastLocationLon");
-            var weatherUri = new Uri($"https://api.openweathermap.org/data/3.0/onecall?lat={forecastLocationLat}&lon={forecastLocationLon}&exclude=currently,minutely,alerts&appid={openWeatherApiKey}");
+        var thisHour = data.hourly[0];
+        var futureHour = data.hourly[4];
+        var today = data.daily[0];
+        Console.WriteLine($"Daily summary for today is: {today.summary}");
+        Console.WriteLine($"Daily summary icon for today is: {today.weather[0].icon}");
+        Console.WriteLine($"The hourly description is: {thisHour.weather[0].description}");
+        Console.WriteLine($"The hourly icon is: {thisHour.weather[0].icon}");
+        Console.WriteLine($"The hourly + 4 description is: {futureHour.weather[0].description}");
+        Console.WriteLine($"The hourly + 4 icon is: {futureHour.weather[0].icon}");
 
-            var handler = new HttpClientHandler
-            {
-                AutomaticDecompression = System.Net.DecompressionMethods.GZip
-            };
-            var httpClient = new HttpClient(handler);
-            
-            var response = await httpClient.GetAsync(weatherUri);
-            response.EnsureSuccessStatusCode();
-            var responseContent = await response.Content.ReadAsStringAsync();
-            dynamic data = JObject.Parse(responseContent);
+        // TODO: Not sure which we want to actually show - hourly summary, hour + N forecast, or daily summary
+        // If the icon is too pessimistic, we could also key off of other properties like .clouds, .pop
+        var forecast = ConvertIconToForecast(futureHour.weather[0].icon.ToString());
+        Console.WriteLine($"The forecast to send is: {forecast}");
 
-            var thisHour = data.hourly[0];
-            var futureHour = data.hourly[4];
-            var today = data.daily[0];
-            log.LogInformation($"Daily summary for today is: {today.summary}");
-            log.LogInformation($"Daily summary icon for today is: {today.weather[0].icon}");
-            log.LogInformation($"The hourly description is: {thisHour.weather[0].description}");
-            log.LogInformation($"The hourly icon is: {thisHour.weather[0].icon}");
-            log.LogInformation($"The hourly + 4 description is: {futureHour.weather[0].description}");
-            log.LogInformation($"The hourly + 4 icon is: {futureHour.weather[0].icon}");
+        return forecast;
+    }
 
-            // TODO: Not sure which we want to actually show - hourly summary, hour + N forecast, or daily summary
-            // If the icon is too pessimistic, we could also key off of other properties like .clouds, .pop
-            var forecast = ConvertIconToForecast(futureHour.weather[0].icon.ToString());
-            log.LogInformation($"The forecast to send is: {forecast}");
-
-            return forecast;
-        }
-
-        public static string ConvertIconToForecast(string icon) =>
-            // https://openweathermap.org/weather-conditions
-            icon switch
-            {
-                "01d" or "01n" => "sunny",
-                "02d" or "02n" or "03d" or "03n" => "partlycloudy",
-                "04d" or "04n" or "50d" or "50n" => "cloudy",
-                _ => "rain"
-            };
-
-        public static async Task SendForecastToDevice(string forecast, ILogger log)
+    private string ConvertIconToForecast(string icon) =>
+        // https://openweathermap.org/weather-conditions
+        icon switch
         {
-            log.LogInformation($"Sending forecast to device...");
+            "01d" or "01n" => "sunny",
+            "02d" or "02n" or "03d" or "03n" => "partlycloudy",
+            "04d" or "04n" or "50d" or "50n" => "cloudy",
+            _ => "rain"
+        };
 
-            var weatherDashboardDeviceAccessKey = Environment.GetEnvironmentVariable("WeatherDashboardDeviceAccessKey", EnvironmentVariableTarget.Process);
-            var weatherDashboardDeviceId = Environment.GetEnvironmentVariable("WeatherDashboardDeviceId", EnvironmentVariableTarget.Process);
+    private async Task SendForecastToDevice(string forecast, string deviceId, string deviceAccessKey)
+    {
+        Console.WriteLine($"Sending forecast to device...");
 
-            await ParticleCloud.SharedCloud.TokenLoginAsync(weatherDashboardDeviceAccessKey);
-            var device = await ParticleCloud.SharedCloud.GetDeviceAsync(weatherDashboardDeviceId);
-            await device.RunFunctionAsync("display", forecast);
-        }
+        await ParticleCloud.SharedCloud.TokenLoginAsync(deviceAccessKey);
+        var device = await ParticleCloud.SharedCloud.GetDeviceAsync(deviceId);
+        var functionResponse = await device.RunFunctionAsync("display", forecast);
+        
+        Console.WriteLine($"Response from device was {functionResponse.ReturnValue}");
     }
 }

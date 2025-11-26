@@ -1,24 +1,21 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace SaintGimp
+namespace SaintGimp.Functions;
+
+public class EmailTest(EmailService emailService, ILogger<EmailTest> logger)
 {
-    public class EmailTest : FunctionBase
+    private readonly EmailService emailService = emailService;
+    private readonly ILogger<EmailTest> _logger = logger;
+
+    [Function("EmailTest")]
+    public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
-        [FunctionName("EmailTest")]
-        public static void Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req, ILogger log)
-        {
-            log.LogInformation($"Testing email notifications...");
+        emailService.SendEmailNotification("This is a test of the emergency broadcasting system!", "saintgimp@hotmail.com");
 
-            SendEmailNotification("This is a test of the emergency broadcasting system!", log);
-
-        }
+        _logger.LogInformation("C# HTTP trigger function processed a request.");
+        return new OkObjectResult("Email sent successfully.");
     }
 }

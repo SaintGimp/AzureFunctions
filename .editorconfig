@@ -1,0 +1,10 @@
+[*.cs]
+
+# CA1873: Avoid potentially expensive logging
+dotnet_diagnostic.CA1873.severity = none
+
+# CA2254: Template should be a static expression
+dotnet_diagnostic.CA2254.severity = none
+
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = none
