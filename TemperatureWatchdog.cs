@@ -12,7 +12,7 @@ public class TemperatureWatchdog(ElasticService elasticService, EmailService ema
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger _logger = logger;
 
-    [Function("TemperatureWatchdog")]
+    //[Function("TemperatureWatchdog")]
     public async Task Run([TimerTrigger("0 */30 * * * *")] TimerInfo myTimer)
     {
         _logger.LogInformation("Executed at: {executionTime}", DateTime.Now);

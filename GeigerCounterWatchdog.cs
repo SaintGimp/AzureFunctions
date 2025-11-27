@@ -12,7 +12,7 @@ public class GeigerCounterWatchdog(ElasticService elasticService, EmailService e
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger _logger = logger;
 
-    [Function("GeigerCounterWatchdog")]
+    //[Function("GeigerCounterWatchdog")]
     public async Task Run([TimerTrigger("0 */30 * * * *")] TimerInfo myTimer)
     {
         _logger.LogInformation("Executed at: {executionTime}", DateTime.Now);

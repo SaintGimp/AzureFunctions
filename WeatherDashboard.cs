@@ -12,7 +12,7 @@ public class WeatherDashboard(IConfiguration configuration, ILogger<WeatherDashb
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger _logger = logger;
 
-    [Function("WeatherDashboard")]
+    //[Function("WeatherDashboard")]
     public async Task Run([TimerTrigger("0 */15 * * * *")] TimerInfo myTimer)
     {
         _logger.LogInformation("Executed at: {executionTime}", DateTime.Now);

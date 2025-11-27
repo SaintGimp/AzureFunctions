@@ -12,7 +12,7 @@ public class EnergyMonitorWatchdog(ElasticService elasticService, EmailService e
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger _logger = logger;
 
-    [Function("EnergyMonitorWatchdog")]
+    //[Function("EnergyMonitorWatchdog")]
     public async Task Run([TimerTrigger("0 */30 * * * *")] TimerInfo myTimer)
     {
         _logger.LogInformation("Executed at: {executionTime}", DateTime.Now);
