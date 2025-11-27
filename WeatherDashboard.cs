@@ -5,15 +5,13 @@ using Particle.SDK;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Configuration;
 
-namespace SaintGimp.Functions;
-
 public class WeatherDashboard(IConfiguration configuration, ILogger<WeatherDashboard> logger)
 {
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger _logger = logger;
 
     [Function("WeatherDashboard")]
-    public async Task Run([TimerTrigger("0 5/15 * * * *")] TimerInfo myTimer)
+    public async Task Run([TimerTrigger("0 */15 * * * *")] TimerInfo myTimer)
     {
         _logger.LogInformation("Executed at: {executionTime}", DateTime.Now);
         

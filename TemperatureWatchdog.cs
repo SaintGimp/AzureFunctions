@@ -5,8 +5,6 @@ using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Configuration;
 using Azure.Communication.Email;
 
-namespace SaintGimp.Functions;
-
 public class TemperatureWatchdog(ElasticService elasticService, EmailService emailService, IConfiguration configuration, ILogger<TemperatureWatchdog> logger)
 {
     private readonly ElasticService elasticService = elasticService;
@@ -15,7 +13,7 @@ public class TemperatureWatchdog(ElasticService elasticService, EmailService ema
     private readonly ILogger _logger = logger;
 
     [Function("TemperatureWatchdog")]
-    public async Task Run([TimerTrigger("0 3/30 * * * *")] TimerInfo myTimer)
+    public async Task Run([TimerTrigger("0 */30 * * * *")] TimerInfo myTimer)
     {
         _logger.LogInformation("Executed at: {executionTime}", DateTime.Now);
         
@@ -30,12 +28,12 @@ public class TemperatureWatchdog(ElasticService elasticService, EmailService ema
             }
             else
             {
-                Console.WriteLine("Everything's fine here, we're all fine, how are you?");
+                _logger.LogInformation("Everything's fine here, we're all fine, how are you?");
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.ToString());
+            _logger.LogError(e.ToString());
             emailService.SendEmailNotification(recipient, "I couldn't check on the temperature sensors!");
         }
     }

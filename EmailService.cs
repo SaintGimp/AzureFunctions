@@ -3,8 +3,6 @@ using Azure.Communication.Email;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace SaintGimp.Functions;
-
 public class EmailService(IConfiguration configuration, ILogger<EmailService> logger)
 {
     private readonly IConfiguration configuration = configuration;
