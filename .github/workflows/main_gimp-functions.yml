@@ -11,7 +11,7 @@ on:
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
-  DOTNET_VERSION: '10.0' # set this to the dotnet version to use
+  DOTNET_VERSION: '10.0.x' # set this to the dotnet version to use
 
 jobs:
   build-and-deploy:
@@ -39,9 +39,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_EDF4657A425547C49733D36F7471255B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_BC94C78E66C54C07ABC2E613849A1D38 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7ADF5CC071934ED4A921EC6DD49450AC }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C68964FEB841404A92A1FDF8B6CEA1B6 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7F7204AE966744E195636E1B8FC608B6 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_964726402B9B436FBEEA35AB97EBDEAF }}
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
