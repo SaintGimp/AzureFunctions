@@ -1,18 +1,20 @@
 ﻿using Azure;
 using Azure.Communication.Email;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace SaintGimp.Functions;
 
-public class EmailService(ILogger<EmailService> logger)
+public class EmailService(IConfiguration configuration, ILogger<EmailService> logger)
 {
+    private readonly IConfiguration configuration = configuration;
     private readonly ILogger<EmailService> _logger = logger;
 
     public void SendEmailNotification(string message, string recipient)
     {
-        _logger.LogInformation($"Sending email tp {recipient} with message: {message}");
+        _logger.LogInformation($"Sending email to {recipient} with message: {message}");
 
-        string connectionString = Environment.GetEnvironmentVariable("EmailConnectionString") ?? "";
+        string connectionString = configuration["EmailConnectionString"] ?? "";
 
         var emailClient = new EmailClient(connectionString);
         var emailContent = new EmailContent(message)
