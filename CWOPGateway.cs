@@ -13,7 +13,7 @@ public class CWOPGateway(ElasticService elasticService, IConfiguration configura
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger _logger = logger;
 
-    //[Function("CWOPGateway")]
+    [Function("CWOPGateway")]
     public async Task Run([TimerTrigger("47 */5 * * * *")] TimerInfo myTimer)
     {
         _logger.LogInformation("Executed at: {executionTime}", DateTime.Now);
