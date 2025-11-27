@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 
+namespace SaintGimp.Functions;
+
 public class ElasticService(IConfiguration configuration, ILogger<ElasticService> logger)
 {
     private readonly IConfiguration configuration = configuration;

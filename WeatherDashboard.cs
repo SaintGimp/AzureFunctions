@@ -5,6 +5,8 @@ using Particle.SDK;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Configuration;
 
+namespace SaintGimp.Functions;
+
 public class WeatherDashboard(IConfiguration configuration, ILogger<WeatherDashboard> logger)
 {
     private readonly IConfiguration configuration = configuration;
@@ -75,12 +77,12 @@ public class WeatherDashboard(IConfiguration configuration, ILogger<WeatherDashb
 
     private async Task SendForecastToDevice(string forecast, string deviceId, string deviceAccessKey)
     {
-        Console.WriteLine($"Sending forecast to device...");
+        _logger.LogInformation($"Sending forecast to device...");
 
         await ParticleCloud.SharedCloud.TokenLoginAsync(deviceAccessKey);
         var device = await ParticleCloud.SharedCloud.GetDeviceAsync(deviceId);
         var functionResponse = await device.RunFunctionAsync("display", forecast);
         
-        Console.WriteLine($"Response from device was {functionResponse.ReturnValue}");
+        _logger.LogInformation($"Response from device was {functionResponse.ReturnValue}");
     }
 }

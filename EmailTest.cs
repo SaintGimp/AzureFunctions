@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
+namespace SaintGimp.Functions;
+
 public class EmailTest(EmailService emailService, ILogger<EmailTest> logger)
 {
     private readonly EmailService emailService = emailService;
