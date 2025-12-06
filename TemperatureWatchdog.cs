@@ -24,7 +24,7 @@ public class TemperatureWatchdog(ElasticService elasticService, EmailService ema
             var mostRecentTemperature = await elasticService.GetMostRecentDocument("logstash-temperatures/_search");
             if (mostRecentTemperature.Age > TimeSpan.FromMinutes(30))
             {
-                emailService.SendEmailNotification(recipient, "Hey, I think the temperature sensors are offline!");
+                emailService.SendEmailNotification("Temperature Sensors Alert", "Hey, I think the temperature sensors are offline!", recipient);
             }
             else
             {
@@ -34,7 +34,7 @@ public class TemperatureWatchdog(ElasticService elasticService, EmailService ema
         catch (Exception e)
         {
             _logger.LogError(e.ToString());
-            emailService.SendEmailNotification(recipient, "I couldn't check on the temperature sensors!");
+            emailService.SendEmailNotification("Temperature Sensors Alert", "I couldn't check on the temperature sensors!", recipient);
         }
     }
 }

@@ -24,7 +24,7 @@ public class EnergyMonitorWatchdog(ElasticService elasticService, EmailService e
             var mostRecentReading = await elasticService.GetMostRecentDocument("logstash-energy/_search");
             if (mostRecentReading.Age > TimeSpan.FromMinutes(30))
             {
-                emailService.SendEmailNotification(recipient, "Hey, I think the energy monitor is offline!");
+                emailService.SendEmailNotification("Energy Monitor Alert", "Hey, I think the energy monitor is offline!", recipient);
             }
             else
             {
@@ -34,7 +34,7 @@ public class EnergyMonitorWatchdog(ElasticService elasticService, EmailService e
         catch (Exception e)
         {
             _logger.LogError(e.ToString());
-            emailService.SendEmailNotification(recipient, "I couldn't check on the energy monitor!");
+            emailService.SendEmailNotification("Energy Monitor Alert", "I couldn't check on the energy monitor!", recipient);
         }
     }
 }

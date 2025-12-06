@@ -10,14 +10,14 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger<EmailService> _logger = logger;
 
-    public void SendEmailNotification(string message, string recipient)
+    public void SendEmailNotification(string subject, string message, string recipient)
     {
-        _logger.LogInformation($"Sending email to {recipient} with message: {message}");
+        _logger.LogInformation($"Sending email to {recipient} with subject: {subject} and message: {message}");
 
         string connectionString = configuration["EmailConnectionString"] ?? "";
 
         var emailClient = new EmailClient(connectionString);
-        var emailContent = new EmailContent(message)
+        var emailContent = new EmailContent(subject)
         {
             PlainText = message
         };

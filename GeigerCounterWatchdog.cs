@@ -24,12 +24,12 @@ public class GeigerCounterWatchdog(ElasticService elasticService, EmailService e
             var mostRecentReading = await elasticService.GetMostRecentDocument("logstash-geiger/_search");
             if (mostRecentReading.Age > TimeSpan.FromMinutes(30))
             {
-                emailService.SendEmailNotification(recipient, "Hey, I think the geiger counter is offline!");
+                emailService.SendEmailNotification("Geiger Counter Alert", "Hey, I think the geiger counter is offline!", recipient);
             }
             else if (mostRecentReading.Data["cpm"] > 256)
             {
                 _logger.LogInformation($"cpm is {mostRecentReading.Data["cpm"]}");
-                emailService.SendEmailNotification(recipient, "Hey, I think the geiger counter is logging bad data!");
+                emailService.SendEmailNotification("Geiger Counter Alert", "Hey, I think the geiger counter is logging bad data!", recipient);
             }
             else
             {
@@ -39,7 +39,7 @@ public class GeigerCounterWatchdog(ElasticService elasticService, EmailService e
         catch (Exception e)
         {
             _logger.LogError(e.ToString());
-            emailService.SendEmailNotification(recipient, "I couldn't check on the geiger counter!");
+            emailService.SendEmailNotification("Geiger Counter Alert", "I couldn't check on the geiger counter!", recipient);
         }
     }
 }
